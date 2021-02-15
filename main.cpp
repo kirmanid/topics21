@@ -14,21 +14,25 @@ struct entity{
     int w;
     int h;
     SDL_Texture* texture;
-    virtual void update();
+    virtual void update(){std::cout<< "base update called\n";};
 };
 
-// struct inertiaEntity : entity {
-//     float xVel = 0;
-//     float yVel = 0;
-//     float actualX;
-//     float actualY;
-//     void update(){
-//         actualX += xVel;
-//         actualY += yVel;
-//         x = int(actualX);
-//         y = int(actualY);
-//     }
-// };
+struct inertiaEntity : public entity {
+    float xVel = 0;
+    float yVel = 0;
+    float xAcc = 0;
+    float yAcc = 0;
+    float actualX;
+    float actualY;
+    void update() override{
+        xVel += xAcc;
+        yVel += yAcc;
+        actualX += xVel;
+        actualY += yVel;
+        x = int(actualX);
+        y = int(actualY);
+    }
+};
 
 struct appState{
     std::vector<entity> entities;
@@ -65,16 +69,16 @@ void handleInput(appState& state, renderWindow& app){
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 if (event.button.button == SDL_BUTTON_LEFT){
-//                     inertiaEntity square;
-//                     square.texture = SDL_CreateTextureFromSurface(app.renderer, SDL_LoadBMP("./rounded-square.bmp"));
-//                     SDL_QueryTexture(square.texture, NULL, NULL, &square.w, &square.h);
-//                     SDL_GetMouseState(&square.x, &square.y);
-//                     square.actualX = float(square.x);
-//                     square.actualY = float(square.y);
-//                     square.w *= 0.25;
-//                     square.h *= 0.25;
-//                     square.yVel = 1.5;
-//                     state.entities.push_back(square);
+                    inertiaEntity square;
+                    square.texture = SDL_CreateTextureFromSurface(app.renderer, SDL_LoadBMP("./rounded-square.bmp"));
+                    SDL_QueryTexture(square.texture, NULL, NULL, &square.w, &square.h);
+                    SDL_GetMouseState(&square.x, &square.y);
+                    square.actualX = float(square.x);
+                    square.actualY = float(square.y);
+                    square.w *= 0.25;
+                    square.h *= 0.25;
+                    square.yVel = 2;
+                    state.entities.push_back(square);
                 }
                 break;
             default:
@@ -85,7 +89,8 @@ void handleInput(appState& state, renderWindow& app){
 
 void updateState(appState& state){
     for (int i = 0; i < state.entities.size(); i++){
-//         state.entities[i].update();
+        state.entities[i].update();
+        state.entities[i].x +=2;
     }
 }
 
