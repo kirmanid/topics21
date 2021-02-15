@@ -1,52 +1,101 @@
 #include <SDL2/SDL.h>
-#include <stdio.h>
+#include <iostream>
+#include <vector>
 
-//Screen dimension constants
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+struct renderWindow{
+    SDL_Renderer* renderer;
+    SDL_Window* window;
+    SDL_Surface* surface;
+};
 
-int main( int argc, char* args[] )
-{
-	//The window we'll be rendering to
-	SDL_Window* window = NULL;
-	
-	//The surface contained by the window
-	SDL_Surface* screenSurface = NULL;
+struct entity{
+    int x;
+    int y;
+    int w;
+    int h;
+    SDL_Texture* texture;
+};
 
-	//Initialize SDL
-	if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
-	{
-		printf( "SDL could not initialize! SDL_Error: %s\n", SDL_GetError() );
-	}
-	else
-	{
-		//Create window
-		window = SDL_CreateWindow( "SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
-		if( window == NULL )
-		{
-			printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );
-		}
-		else
-		{
-			//Get window surface
-			screenSurface = SDL_GetWindowSurface( window );
+struct appState{
+    std::vector<entity> entities;
+};
 
-			//Fill the surface white
-			SDL_FillRect( screenSurface, NULL, SDL_MapRGB( screenSurface->format, 0xFF, 0xFF, 0xFF ) );
-			
-			//Update the surface
-			SDL_UpdateWindowSurface( window );
+renderWindow makeWindow(char* winTitle, unsigned int width, unsigned int height){
+    renderWindow app;
+    if (SDL_Init(SDL_INIT_VIDEO) < 0){
+        std::cout << "Initialization failed! Error:\n" << SDL_GetError() << "\n";
+        exit(1);
+    }
+    app.window = SDL_CreateWindow(winTitle, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, 0);
+    if (!app.window){
+        std::cout << "Window creation failed! Error:\n" << SDL_GetError() << "\n";
+        exit(2);
+    }
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+    app.renderer = SDL_CreateRenderer(app.window, -1, SDL_RENDERER_ACCELERATED); // Uses graphics card when possible
+        if (!app.renderer){
+        std::cout << "Renderer creation failed! Error:\n" << SDL_GetError() << "\n";
+        exit(3);
+    }
+    app.surface = SDL_GetWindowSurface(app.window);
+    return app;
+}
 
-			//Wait two seconds
-			SDL_Delay( 2000 );
-		}
-	}
+// modifes appState based off of input queue
+void handleInput(appState& state, renderWindow& app){
+    SDL_Event event;
+    while(SDL_PollEvent(&event)){
+        switch(event.type){
+            case SDL_QUIT:
+                exit(0);
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if (event.button.button == SDL_BUTTON_LEFT){
+                    entity square;
+                    square.texture = SDL_CreateTextureFromSurface(app.renderer, SDL_LoadBMP("./rounded-square.bmp"));
+                    SDL_QueryTexture(square.texture, NULL, NULL, &square.w, &square.h);
+                    SDL_GetMouseState(&square.x, &square.y);
+                    square.w *= 0.25;
+                    square.h *= 0.25;
+                    state.entities.push_back(square);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+}
 
-	//Destroy window
-	SDL_DestroyWindow( window );
+void updateState(appState& state){
+    for (int i = 0; i < state.entities.size(); i++){
+        state.entities[i].y += -2;
+    }
+}
 
-	//Quit SDL subsystems
-	SDL_Quit();
+// turns appState into rendered scene. Do not modify appState!!
+void drawScene(appState& state, renderWindow& app){
+    SDL_RenderClear(app.renderer);
+    // render entities
+    for (entity e : state.entities){
+        SDL_Rect dest;
+        dest.x = e.x;
+        dest.y = e.y;
+        dest.h = e.h;
+        dest.w = e.w;
+        SDL_RenderCopy(app.renderer, e.texture, NULL, &dest);
+    }
+    SDL_RenderPresent(app.renderer);
+}
 
-	return 0;
+int main(){
+    renderWindow app = makeWindow("teeest", 1280, 720);
+    appState state;
+    unsigned int tick = 16;
+
+    while(true){
+        handleInput(state, app);
+        updateState(state);
+        drawScene(state, app);
+        SDL_Delay(tick);
+    }
 }
