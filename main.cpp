@@ -15,6 +15,7 @@ struct entity{
     int h;
     SDL_Texture* texture;
     virtual void update(){std::cout<< "base update called\n";};
+    int entityType = 0;
 };
 
 struct inertiaEntity : public entity {
@@ -32,6 +33,7 @@ struct inertiaEntity : public entity {
         x = int(actualX);
         y = int(actualY);
     }
+    int entityType = 1;
 };
 
 struct appState{
