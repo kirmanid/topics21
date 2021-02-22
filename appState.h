@@ -20,9 +20,14 @@ public:
     float yVel = 0;
     float xAcc = 0;
     float yAcc = 0;
-    float actualX;
-    float actualY;
     void update() override;
+};
+
+class Particle : public InertiaEntity {
+public:
+    Particle(Entity& entity);
+    Particle();
+    float collisionRadius = -1;
 };
 
 class AppState{

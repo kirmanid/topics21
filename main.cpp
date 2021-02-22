@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #include "renderWindow.h"
 #include "appState.h"
 
@@ -14,15 +15,16 @@ void handleInput(AppState& state, SDL_Renderer* renderer){
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 if (event.button.button == SDL_BUTTON_LEFT){
-                    InertiaEntity* square = new InertiaEntity;
+                    Particle* square = new Particle;
                     square->texture = SDL_CreateTextureFromSurface(renderer, SDL_LoadBMP("./rounded-square.bmp"));
                     SDL_QueryTexture(square->texture, NULL, NULL, &square->w, &square->h);
                     SDL_GetMouseState(&square->x, &square->y);
-                    square->actualX = float(square->x);
-                    square->actualY = float(square->y);
+                    square->x = square->x;
+                    square->y = square->y;
                     square->w *= 0.25;
                     square->h *= 0.25;
-                    square->yAcc = 0.3;
+                    square->collisionRadius = 0.5 * square->w;
+                    square->yAcc = 0.3; 
                     state.entities.push_back(square);
                 }
                 break;
@@ -32,12 +34,51 @@ void handleInput(AppState& state, SDL_Renderer* renderer){
     }
 }
 
-void updateState(AppState& state){
-    for (int i = 0; i < state.entities.size(); i++){
-        state.entities[i]->update();
+struct Collision{
+    Entity* obj1;
+    Entity* obj2;
+};
+
+std::vector<Collision> getCollisions(std::vector<Particle*> particles){
+    std::sort(particles.begin(), particles.end(), [](Entity* a, Entity* b){
+        return a->x > b->x;
+    });
+    int j, activeMax, candidateMin;
+    std::vector<Collision> collisions;
+    for (int i = 0; i < particles.size(); i++){
+        activeMax = int(particles[i]->x + 2 * particles[i]->collisionRadius);
+        j = i;
+        while(true){
+            j++;
+            candidateMin = particles[j]->x;
+            if(activeMax > candidateMin){
+                Collision c;
+                c.obj1 = particles[i];
+                c.obj2 = particles[j];
+                collisions.push_back(c);
+            } else {
+                break;
+            }
+        }
     }
+    return collisions;
 }
 
+//// should be update method on class AppState
+void updateState(AppState& state){
+    std::vector<Particle*> particles;
+    for (int i = 0; i < state.entities.size(); i++){
+        Particle p = static_cast<Particle>(*state.entities[i]);
+        if (p.collisionRadius >= 0){
+            particles.push_back(&p);
+        }
+        state.entities[i]->update();
+    }
+//     std::vector<Collision> collisions = getCollisions(particles);
+    std::cout << particles.size() << '\n'; ////////////////////////////////////
+}
+
+//// should have own header
 // turns AppState into rendered scenes
 void drawScene(const AppState& state, RenderWindow& app){
     SDL_RenderClear(app.renderer);

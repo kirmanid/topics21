@@ -8,14 +8,22 @@ void Entity::update(){
 void InertiaEntity::update(){
     xVel += xAcc;
     yVel += yAcc;
-    actualX += xVel;
-    actualY += yVel;
-    x = int(actualX);
-    y = int(actualY);
+    x += xVel;
+    y += yVel;
 }
 
 AppState::~AppState(){
     for (Entity* e : entities){
         delete e;
     }
+}
+
+Particle::Particle(Entity& entity){
+    x = entity.x;
+    y = entity.y;
+    texture = entity.texture;
+}
+
+Particle::Particle(){
+    // I need this apparently
 }
