@@ -14,22 +14,6 @@ public:
     virtual void update();
 };
 
-class InertiaEntity : public Entity {
-public:
-    float xVel = 0;
-    float yVel = 0;
-    float xAcc = 0;
-    float yAcc = 0;
-    void update() override;
-};
-
-class Particle : public InertiaEntity {
-public:
-    Particle(Entity& entity);
-    Particle();
-    float collisionRadius = -1;
-};
-
 class AppState{
 public:
     std::vector<Entity*> entities;
