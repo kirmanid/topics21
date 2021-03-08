@@ -50,8 +50,12 @@ std::vector<Collision> getCollisions(std::vector<Particle*> particles){
         j = i;
         while(true){
             j++;
+            if (j == particles.size()){
+                break;
+            }
             candidateMin = particles[j]->x;
             if(activeMax > candidateMin){
+                std::cout << activeMax - candidateMin << '\n';
                 Collision c;
                 c.obj1 = particles[i];
                 c.obj2 = particles[j];
@@ -68,14 +72,14 @@ std::vector<Collision> getCollisions(std::vector<Particle*> particles){
 void updateState(AppState& state){
     std::vector<Particle*> particles;
     for (int i = 0; i < state.entities.size(); i++){
-        Particle p = static_cast<Particle>(*state.entities[i]);
-        if (p.collisionRadius >= 0){
-            particles.push_back(&p);
+        Particle* p = dynamic_cast<Particle*>(state.entities[i]);
+        if (p){
+            particles.push_back(p);
         }
         state.entities[i]->update();
     }
-//     std::vector<Collision> collisions = getCollisions(particles);
-    std::cout << particles.size() << '\n'; ////////////////////////////////////
+    std::vector<Collision> collisions = getCollisions(particles);
+//     std::cout << collisions.size() << '\n'; ////////////////////////////////////
 }
 
 //// should have own header
