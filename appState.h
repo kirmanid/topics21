@@ -14,8 +14,19 @@ public:
     virtual void update();
 };
 
+class Sudoku{
+public:
+    void mutate();
+    void adoptParams(Sudoku*);
+    float getFitness();
+    float getAltFitness(){return 0;};
+    int[64] cells;
+    bool[64] fixed;
+};
+
 class AppState{
 public:
+    void update();
     std::vector<Entity*> entities;
     ~AppState();
 };

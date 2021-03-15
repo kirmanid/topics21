@@ -21,13 +21,6 @@ void handleInput(AppState& state, SDL_Renderer* renderer){
     }
 }
 
-//// should be update method on class AppState
-void updateState(AppState& state){
-    for (int i = 0; i < state.entities.size(); i++){
-        state.entities[i]->update();
-    }
-}
-
 //// should have own header
 // turns AppState into rendered scenes
 void drawScene(const AppState& state, RenderWindow& app){
@@ -51,7 +44,7 @@ int main(){
 
     while(true){
         handleInput(state, app.renderer);
-        updateState(state);
+        state.update();
         drawScene(state, app);
         SDL_Delay(tick);
     }
