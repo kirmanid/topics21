@@ -1,52 +1,51 @@
 #include <SDL2/SDL.h>
-#include <stdio.h>
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include "renderWindow.h"
+#include "appState.h"
 
-//Screen dimension constants
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+// modifes AppState based off of input queue
+void handleInput(AppState& state, SDL_Renderer* renderer){
+    SDL_Event event;
+    while(SDL_PollEvent(&event)){
+        switch(event.type){
+            case SDL_QUIT:
+                exit(0);
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                break;
+            default:
+                break;
+        }
+    }
+}
 
-int main( int argc, char* args[] )
-{
-	//The window we'll be rendering to
-	SDL_Window* window = NULL;
-	
-	//The surface contained by the window
-	SDL_Surface* screenSurface = NULL;
+//// should have own header
+// turns AppState into rendered scenes
+void drawScene(const AppState& state, RenderWindow& app){
+    SDL_RenderClear(app.renderer);
+    // render entities
+    for (Entity* e : state.entities){
+        SDL_Rect dest;
+        dest.x = e->x;
+        dest.y = e->y;
+        dest.h = e->h;
+        dest.w = e->w;
+        SDL_RenderCopy(app.renderer, e->texture, NULL, &dest);
+    }
+    SDL_RenderPresent(app.renderer);
+}
 
-	//Initialize SDL
-	if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
-	{
-		printf( "SDL could not initialize! SDL_Error: %s\n", SDL_GetError() );
-	}
-	else
-	{
-		//Create window
-		window = SDL_CreateWindow( "SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
-		if( window == NULL )
-		{
-			printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );
-		}
-		else
-		{
-			//Get window surface
-			screenSurface = SDL_GetWindowSurface( window );
+int main(){
+    RenderWindow app = RenderWindow("teeest", 1280, 720);
+    AppState state;
+    unsigned int tick = 16;
 
-			//Fill the surface white
-			SDL_FillRect( screenSurface, NULL, SDL_MapRGB( screenSurface->format, 0xFF, 0xFF, 0xFF ) );
-			
-			//Update the surface
-			SDL_UpdateWindowSurface( window );
-
-			//Wait two seconds
-			SDL_Delay( 2000 );
-		}
-	}
-
-	//Destroy window
-	SDL_DestroyWindow( window );
-
-	//Quit SDL subsystems
-	SDL_Quit();
-
-	return 0;
+    while(true){
+        handleInput(state, app.renderer);
+        state.update();
+        drawScene(state, app);
+        SDL_Delay(tick);
+    }
 }
