@@ -41,8 +41,45 @@ void Sudoku::adoptParams(Sudoku* victor){
 // for Sudoku, fitness is -1 * number of errors. 0 errors corresponds to a solved sudoku
 void Sudoku::getFitness(){
     int errors = 0;
-    for (int i = 0; i < 10; i++){
-        // incomplete
+    for (int n = 0; n < 9; n++){
+        int i;
+        //grids
+        bool[9] used = {};
+        i = 3 * (n % 4) + 27 * (n / 4); // upper left corner of grid
+        used[i] = true;
+        for (int m = 1; m <= 8; m++){
+            bool addSeven = m % 3 == 0;
+            i += addSeven? 7 : 1;
+            if (used[i]){
+                errors++;
+                break;
+            }
+            used[i] = true;
+        }
+        //cols
+        bool[9] used = {};
+        i = n;
+        used[i] = true;
+        for (int m = 1; m <= 8; m++){
+            i += 9;
+            if (used[i]){
+                errors++;
+                break;
+            }
+            used[i] = true;
+        }
+        //rows
+        bool[9] used = {};
+        i = 9*n;
+        used[i] = true;
+        for (int m = 1; m <= 8; m++){
+            i++;
+            if (used[i]){
+                errors++;
+                break;
+            }
+            used[i] = true;
+        }
     }
     return -1 * errors;
 }

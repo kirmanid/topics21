@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include "ga.h"
 
 class Sudoku{
 public:
@@ -19,9 +20,9 @@ public:
     void mutate();
     void adoptParams(Sudoku&);
     float getFitness();
-    float getAltFitness(){return 0;};
-    bool fixed[81] = {};
+    float getAltFitness(){std::cout<< "WHYYYYYYYYYYYYYYYYYYYYY";return 0;};
 private:
+    bool fixed[81] = {};
     int cells[81] = {};
 };
 
