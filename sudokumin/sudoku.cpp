@@ -4,8 +4,8 @@ void Sudoku::mutate(){
     int swapA = -1;
     int swapB = -1;
     while (swapA < 0 || swapB < 0){
-        swapA = rand() % 64;
-        swapA = rand() % 64;
+        swapA = rand() % 81;
+        swapB = rand() % 81;
         if(fixed[swapA] || fixed[swapB] || swapA == swapB){
             swapA = -1;
             swapB = -1;
@@ -21,64 +21,45 @@ void Sudoku::adoptParams(Sudoku& victor){
     *fixed = *victor.fixed;
 }
 
-/*
-// for Sudoku, fitness is -1 * number of errors. 0 errors corresponds to a solved sudoku
 float Sudoku::getFitness(){
     int errors = 0;
     std::vector<bool> nineFalse(9,false);
     std::vector<bool> used = nineFalse;
     for (int n = 0; n < 9; n++){
-        int i;
+        int val;
+        //rows
+        used = nineFalse;
+        for (int m = 0; m < 9; m++){
+            val = getTile(9*n + m);
+            if (used[val]){
+                errors++;
+                break;
+            }
+            used[val] = true;
+        }
+        //cols
+        for (int m = 0; m < 9; m++){
+            val = getTile(n + 9*m);
+            if (used[val]){
+                errors++;
+                break;
+            }
+            used[val] = true;
+        }
         //grids
-        i = 3 * (n % 4) + 27 * (n / 4); // upper left corner of grid
-        used[i] = true;
+        int i = 3 * (n % 4) + 27 * (n / 4); // upper left corner of grid
+        used[getTile(i)] = true;
         for (int m = 1; m <= 8; m++){
             bool addSeven = m % 3 == 0;
             i += addSeven? 7 : 1;
-            if (used[i]){
-                std::cout << "i = " << i << ",*i = " << cells[i]<<", n = " << n << '\n';
-                errors++;
-                break;
-            }
-            used[i] = true;
-        }
-        
-        //cols
-        used = nineFalse;
-        i = n;
-        used[i] = true;
-        for (int m = 1; m <= 8; m++){
-            i += 9;
-            std::cout << i << std::endl;
-            if (used[i]){
-                errors++;
-                break;
-            }
-            used[i] = true;
-        }
-
-        //rows
-        used = nineFalse;
-        i = 9*n;
-        used[i] = true;
-        for (int m = 1; m <= 8; m++){
-            i++;
-            if (used[i]){
+            if (used[getTile(i)]){
                 errors++;
                 break;
             }
             used[i] = true;
         }
     }
-    return -1 * errors;
-}
-*/
-
-float Sudoku::getFitness(){
-    int errors = 0;
-    std::vector<bool> nineFalse(9,false);
-    std::vector<bool> used = nineFalse;
-    //////
+    
     return -1 * errors;
 }
 
@@ -112,3 +93,22 @@ void Sudoku::fixTile(int index){
 int Sudoku::getTile(int index){
     return cells[index];
 }
+
+void Sudoku::setTile(int x, int y, int value){
+    int index = x + 9*y;
+    if (fixed[index] || value > 9){
+        return;
+    }
+    cells[index] = value;
+}
+
+void Sudoku::fixTile(int x, int y){
+    int index = x + 9*y;
+    fixed[index] = true;
+}
+
+int Sudoku::getTile(int x, int y){
+    int index = x + 9*y;
+    return cells[index];
+}
+
