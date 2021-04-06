@@ -20,8 +20,8 @@ public:
     void adoptParams(Sudoku*);
     float getFitness();
     float getAltFitness(){return 0;};
-    int[64] cells;
-    bool[64] fixed;
+    int[81] cells;
+    bool[81] fixed;
 };
 
 class AppState{
