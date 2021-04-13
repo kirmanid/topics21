@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <random>
+#include <iostream>
 
 /*
  * This is a population-sampling genetic algorithm. Think 'iterated Hunger Games'. 
@@ -20,6 +21,7 @@ public:
     void runTournament();
     std::vector<T> population;
     unsigned long int tournamentTally;
+    void dumpPopFitness();
 private:
     unsigned int tournamentSize;
     float pAltTournament;
@@ -38,6 +40,20 @@ void GA<T>::populate(T adam, unsigned int mutationCycles, unsigned int popSize, 
     for (int i = 0; i < population.size() * mutationCycles; i++){
         population[i % population.size()].mutate();
     }
+}
+
+template <typename T>
+void GA<T>::dumpPopFitness(){
+    float fitness;
+    float meanFitness;
+    for (T organism : population){
+        fitness = organism.getFitness();
+        meanFitness += fitness;
+        std::cout << " | " << fitness;
+    }
+    meanFitness = meanFitness / population.size();
+    std::cout << " | MEAN FITNESS: " << meanFitness;
+    std::cout << '\n';
 }
 
 template <typename T>
