@@ -14,10 +14,10 @@ int main(){
     s.renderBoard();
     std::cout << "FITNESS: " << s.getFitness() << '\n';
     
-    GA<Sudoku> world;
+    GA<Sudoku> world; 
     world.populate(s, 0, 16, 4, 0.0);
     
-    while (world.tournamentTally < 1e4){
+    while (world.tournamentTally < 1e3){
         world.runTournament();
 //          std::cout << "FITNESS: " << world.population[0].getFitness() << '\n';
         world.dumpPopFitness();
