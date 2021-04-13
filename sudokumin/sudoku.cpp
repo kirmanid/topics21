@@ -17,8 +17,10 @@ void Sudoku::mutate(){
 }
 
 void Sudoku::adoptParams(Sudoku& victor){
-    *cells = *victor.cells;
-    *fixed = *victor.fixed;
+    for (int i = 0; i < 81; i++){
+        cells[i] = victor.getTile(i);
+        fixed[i] = victor.fixed[i];
+    }
 }
 
 float Sudoku::getFitness(){
@@ -33,7 +35,7 @@ float Sudoku::getFitness(){
             val = getTile(9*n + m);
             if (used[val]){
                 errors++;
-                break;
+//                 break;
             }
             used[val] = true;
         }
@@ -42,7 +44,7 @@ float Sudoku::getFitness(){
             val = getTile(n + 9*m);
             if (used[val]){
                 errors++;
-                break;
+//                 break;
             }
             used[val] = true;
         }
@@ -54,7 +56,7 @@ float Sudoku::getFitness(){
             i += addSeven? 7 : 1;
             if (used[getTile(i)]){
                 errors++;
-                break;
+//                 break;
             }
             used[i] = true;
         }
