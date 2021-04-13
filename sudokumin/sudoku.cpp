@@ -40,6 +40,7 @@ float Sudoku::getFitness(){
             used[val] = true;
         }
         //cols
+        used = nineFalse;
         for (int m = 0; m < 9; m++){
             val = getTile(n + 9*m);
             if (used[val]){
@@ -49,6 +50,7 @@ float Sudoku::getFitness(){
             used[val] = true;
         }
         //grids
+        used = nineFalse;
         int i = 3 * (n % 4) + 27 * (n / 4); // upper left corner of grid
         used[getTile(i)] = true;
         for (int m = 1; m <= 8; m++){
