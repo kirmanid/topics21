@@ -52,7 +52,7 @@ void GA<T>::dumpPopFitness(){
         std::cout << " | " << fitness;
     }
     meanFitness = meanFitness / population.size();
-    std::cout << " | MEAN FITNESS: " << meanFitness;
+    std::cout << " | \nMEAN FITNESS: " << meanFitness;
     std::cout << '\n';
 }
 

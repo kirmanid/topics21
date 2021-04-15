@@ -1,19 +1,33 @@
 #include "sudoku.h"
 
 void Sudoku::mutate(){
-    int swapA = -1;
-    int swapB = -1;
-    while (swapA < 0 || swapB < 0){
-        swapA = rand() % 81;
-        swapB = rand() % 81;
-        if(fixed[swapA] || fixed[swapB] || swapA == swapB){
-            swapA = -1;
-            swapB = -1;
+    if ( pMetaMutate > ((float) rand() / (RAND_MAX))){
+        
+        pMetaMutate *=  ((float) rand() / (RAND_MAX)) > 0.5 ? 0.8 : 1.2;
+        
+        if (((float) rand() / (RAND_MAX)) > 0.5){
+            if (numMut > 1){
+                numMut--;
+            }
+        } else {
+            numMut++;
         }
     }
-    int bHolder = cells[swapB];
-    cells[swapB] = cells[swapA];
-    cells[swapA] = bHolder;
+    for (int i = 0; i < numMut; i++){
+        int swapA = -1;
+        int swapB = -1;
+        while (swapA < 0 || swapB < 0){
+            swapA = rand() % 81;
+            swapB = rand() % 81;
+            if(fixed[swapA] || fixed[swapB] || swapA == swapB){
+                swapA = -1;
+                swapB = -1;
+            }
+        }
+        int bHolder = cells[swapB];
+        cells[swapB] = cells[swapA];
+        cells[swapA] = bHolder;
+    }
 }
 
 void Sudoku::adoptParams(Sudoku& victor){
@@ -35,7 +49,6 @@ float Sudoku::getFitness(){
             val = getTile(9*n + m);
             if (used[val]){
                 errors++;
-//                 break;
             }
             used[val] = true;
         }
@@ -45,22 +58,29 @@ float Sudoku::getFitness(){
             val = getTile(n + 9*m);
             if (used[val]){
                 errors++;
-//                 break;
             }
             used[val] = true;
         }
         //grids
         used = nineFalse;
-        int i = 3 * (n % 4) + 27 * (n / 4); // upper left corner of grid
-        used[getTile(i)] = true;
-        for (int m = 1; m <= 8; m++){
-            bool addSeven = m % 3 == 0;
-            i += addSeven? 7 : 1;
-            if (used[getTile(i)]){
+        int x, y;
+        int deltaX = 0;
+        int deltaY = 0;
+        x = 3 * (n % 3);
+        y = 3 * (n / 3);
+        for (int m = 0; m < 9; m++){
+//             std::cout << "x: " << x + deltaX << " y: "  << y + deltaY << '\n';
+            val = getTile(x + deltaX, y + deltaY);
+            if (used[val]){
                 errors++;
-//                 break;
             }
-            used[i] = true;
+            used[val] = true;
+            if (deltaX == 2){
+                deltaX = 0;
+                deltaY++;
+            } else {
+                deltaX++;
+            }
         }
     }
     

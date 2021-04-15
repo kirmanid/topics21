@@ -21,6 +21,10 @@ public:
     void adoptParams(Sudoku&);
     float getFitness();
     float getAltFitness(){std::cout<< "WHYYYYYYYYYYYYYYYYYYYYY";return 0;};
+    
+    float pMetaMutate = 0.0;
+    int numMut = 1;
+    
     bool fixed[81] = {};
 private:
     int cells[81] = {};
