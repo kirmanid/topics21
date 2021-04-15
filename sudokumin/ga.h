@@ -83,7 +83,9 @@ void GA<T>::runTournament(){
             continue;
         }
         contestants[i]->adoptParams(*contestants[bestContestant]);
-        contestants[i]->mutate();
+        if (i != 0){ // optional, keeps [0] good
+            contestants[i]->mutate();
+        }
     }
     /// Uncomment for 'parental death'
 //     contestants[bestContestant].mutate();
